@@ -1,0 +1,54 @@
+# --------------------
+# Python
+# --------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.env
+.venv/
+venv/
+myenv/
+
+# --------------------
+# FastAPI / Uvicorn
+# --------------------
+*.log
+logs/
+uvicorn.log
+
+# --------------------
+# Database
+# --------------------
+*.db
+*.sqlite3
+
+# --------------------
+# Uploads / Temp Files
+# --------------------
+uploads/
+temp/
+*.wav
+*.mp3
+*.m4a
+
+# --------------------
+# OS / Editor
+# --------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --------------------
+# Test / Coverage
+# --------------------
+.coverage
+htmlcov/
+.pytest_cache/
+
+# --------------------
+# Misc
+# --------------------
+*.zip
