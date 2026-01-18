@@ -124,4 +124,59 @@ def analyze_transcript(transcript_id: int, db: Session = Depends(get_db)):
         "transcript_id": transcript.id,
         "analysis": analysis,
     }
+
+from app.models.attempt import Attempt
+from app.models.score import Score
+from app.schemas.score import ScoreResponse, EvaluationType
+from app.services.scoring import ScoringService
+
+@router.post("/", response_model=ScoreResponse)
+def evaluate_attempt(
+    attempt_id: int,
+    evaluation_type: EvaluationType,
+    analysis_data: dict,
+    db: Session = Depends(get_db),
+):
+    """
+    1. Take analysis data
+    2. Calculate score
+    3. Store score
+    4. Return score
+    """
+
+    # 1. Fetch attempt
+    attempt = db.query(Attempt).filter(Attempt.id == attempt_id).first()
+    if not attempt:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+
+    # 2. Calculate score
+    if evaluation_type == EvaluationType.speaking:
+        score_data = ScoringService.calculate_speaking_score(analysis_data)
+    else:
+        score_data = ScoringService.calculate_writing_score(analysis_data)
+
+    # 3. Store score
+    score = Score(
+        attempt_id=attempt.id,
+        evaluation_type=score_data["evaluation_type"].value,
+        grammar=score_data["grammar"],
+        coherence=score_data["coherence"],
+        fluency=score_data.get("fluency"),
+        pronunciation=score_data.get("pronunciation"),
+        vocabulary=score_data.get("vocabulary"),
+        task_relevance=score_data.get("task_relevance"),
+        overall=score_data["overall"],
+    )
+
+    db.add(score)
+    db.commit()
+    db.refresh(score)
+
+    # 4. Return response
+    return ScoreResponse(
+        attempt_id=attempt.id,
+        evaluation_type=evaluation_type,
+        score=score_data,
+    )
+
     
