@@ -31,7 +31,6 @@ def count_filler_words(transcribed_text: str) -> int:
     count = sum(1 for w in words if w in fillers)
     return count
 
-
 # ---------------- Pronunciation Score ----------------
 def compute_pronunciation_score(transcribed_text: str, audio_path: str) -> float:
     """

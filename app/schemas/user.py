@@ -4,7 +4,7 @@ class UserCreate(BaseModel):            #user sends the following data to us, so
     name: str= Field(...,min_length = 1)
     email: EmailStr
     password: str = Field(..., min_length=6)
-    age: int =Field(..., ge=5, le=100)
+    age: int =Field(..., ge=12, le=60)
     job_role: str= Field(..., min_length=1)
 
 class UserResponse(BaseModel):          # we send this back to the user ,so basically Outgoing Data
@@ -14,6 +14,6 @@ class UserResponse(BaseModel):          # we send this back to the user ,so basi
     age: int
     job_role: str
 
-class Config:
-    orm_mode = True     # enables reading data from SQLAlchemy models
-
+    class Config:
+        orm_mode = True     # enables reading data from SQLAlchemy models that is ORM objects
+        

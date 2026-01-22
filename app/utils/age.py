@@ -4,13 +4,9 @@ from app.core.enums import AgeCategory
 def get_age_category(age: int) -> AgeCategory:
     """
     Maps a numeric age to an AgeCategory enum.
-    
-    Args:
-        age (int): User age
-    
+    Args:age (int): User age
     Returns:
         AgeCategory: Corresponding age category
-    
     Raises:
         ValueError: If age is negative or outside supported range
     """

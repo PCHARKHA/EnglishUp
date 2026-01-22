@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.models.prompt import Prompt
 from app.core.enums import AgeCategory, SkillType, ProficiencyLevel,DifficultyLevel
 
@@ -29,6 +30,7 @@ def get_prompt_for_user(        #the main logic
             Prompt.difficulty == difficulty,
             Prompt.is_active == True
         )
+        .order_by(func.random())
         .first()
     )
     if not prompt:
