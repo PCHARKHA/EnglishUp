@@ -2,7 +2,8 @@ from sqlalchemy import Column, Integer, String, Enum, Boolean
 from app.db.base import Base
 from app.core.enums import AgeCategory, SkillType, DifficultyLevel
 from sqlalchemy.orm import relationship
-
+from sqlalchemy.sql import func
+from sqlalchemy import DateTime
 class Prompt(Base):
     __tablename__ = "prompts"
 
@@ -14,6 +15,7 @@ class Prompt(Base):
 
     prompt_text = Column(String, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     transcripts = relationship(
         "Transcript",

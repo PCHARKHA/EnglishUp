@@ -1,27 +1,44 @@
-# app/routes/evaluate.py
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+# app/api/v1/routers/evaluate.py
+
+from fastapi import (APIRouter,Depends,HTTPException,UploadFile,File,Form,)
 from sqlalchemy.orm import Session
 import os
 import shutil
 import uuid
 
 from app.db.session import get_db
-from app.schemas.evaluate import EvaluateRequest, SubmitResponseSchema
+from app.schemas.evaluate import EvaluateRequest
+from app.schemas.score import ScoreResponse, EvaluationType
 from app.services.prompt_engine import get_prompt
 from app.utils.age import get_age_category
 from app.utils.proficiency import get_proficiency_level
 from app.services.speech_to_text import SpeechToTextService
-from app.models.transcripts import Transcript
 from app.services.basic_analysis import BasicAnalysisService
+from app.services.scoring import ScoringService
 
-router = APIRouter()
+from app.models.transcripts import Transcript
+from app.models.attempt import Attempt
+from app.models.score import Score
 
-# --- /evaluate endpoint ---
-@router.post("/evaluate")
-def evaluate(data: EvaluateRequest, db: Session = Depends(get_db)):
-    """
-    Returns a prompt based on user's age, proficiency, and skill type.
-    """
+router = APIRouter(
+    prefix="/api/v1/evaluate",
+    tags=["evaluation"],
+)
+
+speech_service = SpeechToTextService()
+
+UPLOAD_DIR = "uploads/audio"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+# ------------------------------------------------
+# 1. Get prompt
+# ------------------------------------------------
+@router.post("/prompt")
+def get_evaluation_prompt(
+    data: EvaluateRequest,
+    db: Session = Depends(get_db),
+):
     try:
         age_category = get_age_category(data.age)
         proficiency = get_proficiency_level(data.proficiency)
@@ -34,8 +51,9 @@ def evaluate(data: EvaluateRequest, db: Session = Depends(get_db)):
         proficiency=proficiency,
         skill_type=data.skill_type,
     )
+
     if not prompt:
-        raise HTTPException(status_code=404, detail="No prompt found for the given criteria")
+        raise HTTPException(status_code=404, detail="No prompt found")
 
     return {
         "prompt_id": prompt.id,
@@ -44,38 +62,38 @@ def evaluate(data: EvaluateRequest, db: Session = Depends(get_db)):
     }
 
 
-# --- Setup for /submit_response endpoint ---
-speech_service = SpeechToTextService()
-UPLOAD_DIR = "uploads/audio"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-
-@router.post("/submit_response")
+# ------------------------------------------------
+# 2. Submit response (text or speech)
+# ------------------------------------------------
+@router.post("/submit")
 async def submit_response(
-    data: SubmitResponseSchema = Depends(),
-    audio_file: UploadFile = File(None),
-    db: Session = Depends(get_db)
+    user_id: int = Form(...),
+    prompt_id: int = Form(...),
+    text_response: str | None = Form(None),
+    audio_file: UploadFile | None = File(None),
+    db: Session = Depends(get_db),
 ):
-    """
-    Accepts user response as text or audio, transcribes if needed, stores temporarily in DB.
-    """
-    # Validation rules
-    if audio_file and data.text_response:
-        raise HTTPException(status_code=400, detail="Provide either text or audio, not both")
-    if not audio_file and not data.text_response:
-        raise HTTPException(status_code=400, detail="Text or audio is required")
+    if audio_file and text_response:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide either text or audio, not both",
+        )
+
+    if not audio_file and not text_response:
+        raise HTTPException(
+            status_code=400,
+            detail="Text or audio is required",
+        )
 
     response_text = ""
-    response_type = "text"
+    input_mode = "text"
     audio_path = None
 
-    # --- Case 1: Text input ---
-    if data.text_response:
-        response_text = data.text_response.strip()
+    if text_response:
+        response_text = text_response.strip()
 
-    # --- Case 2: Audio input ---
     if audio_file:
-        response_type = "speech"
+        input_mode = "speech"
         filename = f"{uuid.uuid4()}_{audio_file.filename}"
         audio_path = os.path.join(UPLOAD_DIR, filename)
 
@@ -85,30 +103,41 @@ async def submit_response(
         response_text = speech_service.transcribe(audio_path)
 
         if not response_text:
-            raise HTTPException(status_code=400, detail="Could not transcribe audio")
+            raise HTTPException(
+                status_code=400,
+                detail="Could not transcribe audio",
+            )
 
-    # --- Temporary DB storage ---
-    user_response = Transcript(
-        user_id=data.user_id,
-        prompt_id=data.prompt_id,
+    transcript = Transcript(
+        user_id=user_id,
+        prompt_id=prompt_id,
         text=response_text,
-        input_mode=response_type,
-        audio_path=audio_path
+        input_mode=input_mode,
+        audio_path=audio_path,
     )
 
-    db.add(user_response)
-    db.commit()
-    db.refresh(user_response)
+    try:
+        db.add(transcript)
+        db.commit()
+        db.refresh(transcript)
+    except Exception:
+        db.rollback()
+        raise
 
-    # --- Return response info (ready for evaluation) ---
     return {
-        "response_id": user_response.id,
+        "transcript_id": transcript.id,
         "text": response_text,
-    
-        }
+    }
 
+
+# ------------------------------------------------
+# 3. Analyze transcript
+# ------------------------------------------------
 @router.get("/analysis/{transcript_id}")
-def analyze_transcript(transcript_id: int, db: Session = Depends(get_db)):
+def analyze_transcript(
+    transcript_id: int,
+    db: Session = Depends(get_db),
+):
     transcript = (
         db.query(Transcript)
         .filter(Transcript.id == transcript_id)
@@ -125,40 +154,34 @@ def analyze_transcript(transcript_id: int, db: Session = Depends(get_db)):
         "analysis": analysis,
     }
 
-from app.models.attempt import Attempt
-from app.models.score import Score
-from app.schemas.score import ScoreResponse, EvaluationType
-from app.services.scoring import ScoringService
 
-@router.post("/", response_model=ScoreResponse)
+# ------------------------------------------------
+# 4. Final scoring
+# ------------------------------------------------
+@router.post("/score", response_model=ScoreResponse)
 def evaluate_attempt(
     attempt_id: int,
     evaluation_type: EvaluationType,
     analysis_data: dict,
     db: Session = Depends(get_db),
 ):
-    """
-    1. Take analysis data
-    2. Calculate score
-    3. Store score
-    4. Return score
-    """
+    attempt = (
+        db.query(Attempt)
+        .filter(Attempt.id == attempt_id)
+        .first()
+    )
 
-    # 1. Fetch attempt
-    attempt = db.query(Attempt).filter(Attempt.id == attempt_id).first()
     if not attempt:
         raise HTTPException(status_code=404, detail="Attempt not found")
 
-    # 2. Calculate score
     if evaluation_type == EvaluationType.speaking:
         score_data = ScoringService.calculate_speaking_score(analysis_data)
     else:
         score_data = ScoringService.calculate_writing_score(analysis_data)
 
-    # 3. Store score
     score = Score(
         attempt_id=attempt.id,
-        evaluation_type=score_data["evaluation_type"].value,
+        evaluation_type=evaluation_type.value,
         grammar=score_data["grammar"],
         coherence=score_data["coherence"],
         fluency=score_data.get("fluency"),
@@ -168,15 +191,16 @@ def evaluate_attempt(
         overall=score_data["overall"],
     )
 
-    db.add(score)
-    db.commit()
-    db.refresh(score)
+    try:
+        db.add(score)
+        db.commit()
+        db.refresh(score)
+    except Exception:
+        db.rollback()
+        raise
 
-    # 4. Return response
     return ScoreResponse(
         attempt_id=attempt.id,
         evaluation_type=evaluation_type,
         score=score_data,
     )
-
-    

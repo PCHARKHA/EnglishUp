@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship
-
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
 from app.db.base import Base
 
 
@@ -32,3 +33,5 @@ class Score(Base):
 
     # Relationship back to attempt
     attempt = relationship("Attempt", back_populates="score")
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

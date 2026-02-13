@@ -1,8 +1,9 @@
 # app/api/v1/routers/progress.py
-# app/api/v1/routers/progress.py
-from fastapi import APIRouter, Depends, HTTPException
+
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
+
 from app.db.session import get_db
 from app.models.user import User
 from app.models.attempt import Attempt
@@ -10,49 +11,111 @@ from app.models.score import Score
 from app.core.security import get_current_user
 from app.schemas.score import ScoreResponse
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/api/v1/progress",
+    tags=["progress"],
+)
 
-@router.get("/my_progress", response_model=dict)
+
+# ------------------------------------------------
+# Helper: level calculation
+# ------------------------------------------------
+def calculate_level(avg_score: float) -> str:
+    if avg_score < 4:
+        return "Beginner"
+    if avg_score < 7:
+        return "Improving"
+    if avg_score < 9:
+        return "Confident"
+    return "Strong"
+
+
+# ------------------------------------------------
+# 1. Overall user progress
+# ------------------------------------------------
+@router.get("/me")
 def get_user_progress(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-    """
-    Get user's overall progress: total attempts, average scores, current level.
-    """
-    attempts = db.query(Attempt).filter(Attempt.user_id == current_user.id).all()
+    attempts = (
+        db.query(Attempt)
+        .filter(Attempt.user_id == current_user.id)
+        .all()
+    )
+
     if not attempts:
-        return {"message": "No attempts yet. Start practicing!"}
-    
-    scores = [db.query(Score).filter(Score.attempt_id == a.id).first() for a in attempts if a.score]
-    scores = [s for s in scores if s]  # Filter None
-    
+        return {
+            "total_attempts": 0,
+            "average_overall": 0,
+            "level": "Beginner",
+            "recent_scores": [],
+        }
+
+    attempt_ids = [a.id for a in attempts]
+
+    scores = (
+        db.query(Score)
+        .filter(Score.attempt_id.in_(attempt_ids))
+        .order_by(Score.created_at.desc())
+        .all()
+    )
+
     if not scores:
-        return {"total_attempts": len(attempts), "average_overall": 0, "level": "Beginner"}
-    
+        return {
+            "total_attempts": len(attempts),
+            "average_overall": 0,
+            "level": "Beginner",
+            "recent_scores": [],
+        }
+
     avg_overall = sum(s.overall for s in scores) / len(scores)
-    level = "Beginner" if avg_overall < 4 else "Improving" if avg_overall < 7 else "Confident" if avg_overall < 9 else "Strong"
-    
+
     return {
         "total_attempts": len(attempts),
         "average_overall": round(avg_overall, 2),
-        "level": level,
-        "recent_scores": [ScoreResponse.from_orm(s) for s in scores[-5:]]  # Last 5
+        "level": calculate_level(avg_overall),
+        "recent_scores": [
+            ScoreResponse.from_orm(s)
+            for s in scores[:5]
+        ],
     }
 
-@router.get("/attempts", response_model=List[dict])
+
+# ------------------------------------------------
+# 2. Attempts history
+# ------------------------------------------------
+@router.get("/attempts")
 def get_user_attempts(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-    """Get list of user's attempts with scores."""
-    attempts = db.query(Attempt).filter(Attempt.user_id == current_user.id).all()
-    result = []
-    for a in attempts:
-        score = db.query(Score).filter(Score.attempt_id == a.id).first()
-        result.append({
+    attempts = (
+        db.query(Attempt)
+        .filter(Attempt.user_id == current_user.id)
+        .order_by(Attempt.created_at.desc())
+        .all()
+    )
+
+    attempt_ids = [a.id for a in attempts]
+
+    scores = (
+        db.query(Score)
+        .filter(Score.attempt_id.in_(attempt_ids))
+        .all()
+    )
+
+    score_map = {s.attempt_id: s for s in scores}
+
+    return [
+        {
             "attempt_id": a.id,
             "created_at": a.created_at,
-            "score": ScoreResponse.from_orm(score) if score else None
-        })
-    return result
+            "score": (
+                ScoreResponse.from_orm(score_map[a.id])
+                if a.id in score_map
+                else None
+            ),
+        }
+        for a in attempts
+    ]

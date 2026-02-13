@@ -8,7 +8,6 @@ class SpeechToTextService:
     def __init__(self, model_name: str = "base"):
         """
         Initialize Whisper model.
-        
         Args:
             model_name (str): Whisper model variant ('tiny', 'base', 'small', 'medium', 'large')
         """
@@ -20,10 +19,8 @@ class SpeechToTextService:
     def transcribe(self, audio_path: str) -> str:
         """
         Transcribe audio file to text.
-        
         Args:
             audio_path (str): Path to the audio file
-        
         Returns:
             str: Transcribed text
         """

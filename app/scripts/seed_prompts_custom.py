@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.models.prompt import Prompt
 from app.core.enums import AgeCategory, ProficiencyLevel, SkillType, DifficultyLevel
+from app.services.prompt_engine import resolve_difficulty
+
 
 # --- Utility function to map proficiency to difficulty ---
 def proficiency_to_difficulty(proficiency: ProficiencyLevel) -> DifficultyLevel:
@@ -127,17 +129,13 @@ PROMPTS = {
 
 
 def seed():
-    """
-    Seed all prompts into the database.
-    """
     db: Session = SessionLocal()
     try:
         for age_category, prof_map in PROMPTS.items():
             for proficiency, skill_map in prof_map.items():
-                difficulty = proficiency_to_difficulty(proficiency)
+                difficulty = resolve_difficulty(proficiency)
 
                 for skill_type, text in skill_map.items():
-                    # Avoid duplicates if running multiple times
                     existing = (
                         db.query(Prompt)
                         .filter_by(
@@ -155,6 +153,7 @@ def seed():
                                 skill_type=skill_type,
                                 difficulty=difficulty,
                                 prompt_text=text,
+                                is_active=True,
                             )
                         )
 

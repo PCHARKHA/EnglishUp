@@ -1,4 +1,5 @@
 # test_analysis.py
+
 from app.db.session import SessionLocal
 from app.models.transcripts import Transcript
 from app.services.language_analysis import LanguageAnalysisService
@@ -9,8 +10,8 @@ import os
 db = SessionLocal()
 
 # ---------------- Create a Test Transcript ----------------
-# Use a small audio file if you want speaking metrics, or leave None for text-only
-audio_file = None  # Example: "tests/sample_audio.wav" if available
+# Optional: Provide a sample audio file path for speaking test
+audio_file = None  # e.g., "tests/sample_audio.wav" (ensure file exists)
 
 test_text = (
     "This is a simple test sentence. "
@@ -18,38 +19,57 @@ test_text = (
     "Hopefully, everything is fine!"
 )
 
-transcript = Transcript(
-    user_id=1,
-    prompt_id=1,
-    text=test_text,
-    input_mode="text" if not audio_file else "speech",
-    audio_path=audio_file
-)
+try:
+    # Check if user_id=1 and prompt_id=1 exist (basic validation)
+    from app.models.user import User
+    from app.models.prompt import Prompt
+    user = db.query(User).filter(User.id == 1).first()
+    prompt = db.query(Prompt).filter(Prompt.id == 1).first()
+    if not user or not prompt:
+        raise ValueError("Test user or prompt not found. Seed DB first.")
 
-db.add(transcript)
-db.commit()
-db.refresh(transcript)
+    transcript = Transcript(
+        user_id=1,
+        prompt_id=1,
+        text=test_text,
+        input_mode="text" if not audio_file else "speech",
+        audio_path=audio_file
+    )
 
-print(f"Created test transcript with ID: {transcript.id}")
+    db.add(transcript)
+    db.commit()
+    db.refresh(transcript)
 
-# ---------------- Run Language Analysis ----------------
-lang_service = LanguageAnalysisService(transcript.text)
-lang_metrics = lang_service.analyze()
-print("\n--- Language Analysis Metrics ---")
-for k, v in lang_metrics.items():
-    print(f"{k}: {v}")
+    print(f"Created test transcript with ID: {transcript.id}")
 
-# ---------------- Run Speaking Analysis ----------------
-if audio_file:
-    speak_service = SpeakingAnalysisService(transcript.text, transcript.audio_path)
-    speak_metrics = speak_service.analyze()
-    print("\n--- Speaking Analysis Metrics ---")
-    for k, v in speak_metrics.items():
+    # ---------------- Run Language Analysis ----------------
+    lang_service = LanguageAnalysisService(transcript.text)
+    lang_metrics = lang_service.analyze()
+    print("\n--- Language Analysis Metrics ---")
+    for k, v in lang_metrics.items():
         print(f"{k}: {v}")
-else:
-    print("\nNo audio provided; skipping speaking analysis.")
 
-# ---------------- Clean Up ----------------
-db.delete(transcript)
-db.commit()
-db.close()
+    # ---------------- Run Speaking Analysis ----------------
+    if audio_file and os.path.exists(audio_file):
+        speak_service = SpeakingAnalysisService(transcript.text, transcript.audio_path)
+        speak_metrics = speak_service.analyze()
+        print("\n--- Speaking Analysis Metrics ---")
+        for k, v in speak_metrics.items():
+            print(f"{k}: {v}")
+    else:
+        print("\nNo valid audio provided; skipping speaking analysis.")
+
+except Exception as e:
+    print(f"Error during testing: {e}")
+    db.rollback()
+
+finally:
+    # ---------------- Clean Up ----------------
+    try:
+        db.delete(transcript)
+        db.commit()
+    except:
+        pass  # Ignore if already deleted or error
+    db.close()
+
+print("Test completed.")

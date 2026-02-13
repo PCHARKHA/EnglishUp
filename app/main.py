@@ -3,73 +3,61 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
-from app.db.base import Base  # For table creation
-from app.db.session import engine  # Your DB engine
-from app.api.v1.routers import analysis, auth, progress, evaluate, prompts  # Ensure all exist
 
-# Lifespan event for startup/shutdown (replaces deprecated @app.on_event)
+from app.db.base import Base
+from app.db.session import engine
+
+from app.api.v1.routers import analysis, auth, progress, evaluate, prompts
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Create DB tables
+    """
+    Startup / shutdown lifecycle.
+    NOTE: create_all is acceptable for MVP only.
+    """
     Base.metadata.create_all(bind=engine)
-    print("EnglishUp backend started - DB tables created")
+    print("✅ EnglishUp backend started")
     yield
-    # Shutdown: Add cleanup if needed (e.g., close connections)
-    print("EnglishUp backend shutting down")
+    print("🛑 EnglishUp backend shutting down")
 
-# Create FastAPI app
+
 app = FastAPI(
     title="EnglishUp API",
     version="1.0.0",
     description="Backend API for English speaking and writing evaluation",
-    lifespan=lifespan  # Use lifespan instead of on_event
+    lifespan=lifespan
 )
 
-# Add CORS middleware (allow frontend origins)
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://your-frontend-domain.com"],  # Update with your frontend URL
+    allow_origins=[
+        "http://localhost:3000",
+        "https://your-frontend-domain.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Global exception handler for cleaner errors
+# Safer global exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    print(f"🔥 Unhandled error: {exc}")
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error", "error": str(exc)}
+        content={"detail": "Internal server error"}
     )
 
-# Include routers (use aggregator if preferred: app.include_router(api_router, prefix="/api/v1"))
-app.include_router(
-    auth.router,
-    prefix="/api/v1/auth",
-    tags=["Authentication"]
-)
-app.include_router(
-    prompts.router,
-    prefix="/api/v1/prompts",
-    tags=["Prompts"]
-)
-app.include_router(
-    evaluate.router,
-    prefix="/api/v1/evaluate",
-    tags=["Evaluation"]
-)
-app.include_router(
-    analysis.router,
-    prefix="/api/v1/analysis",
-    tags=["Analysis"]
-)
-app.include_router(
-    progress.router,
-    prefix="/api/v1/progress",
-    tags=["Progress"]
-)
+# Register routers
+# IMPORTANT: routers already define their own prefixes
+app.include_router(auth.router)
+app.include_router(prompts.router)
+app.include_router(evaluate.router)
+app.include_router(analysis.router)
+app.include_router(progress.router)
 
-# Optional: Root endpoint
 @app.get("/")
 def root():
     return {"message": "Welcome to EnglishUp API"}

@@ -42,7 +42,7 @@ def compute_readability(text: str) -> float:
     try:
         score = flesch_kincaid_grade(text)
         return score
-    except:
+    except Exception:
         return 0.0
 
 

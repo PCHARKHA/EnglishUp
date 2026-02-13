@@ -13,6 +13,8 @@ class UserResponse(BaseModel):          # we send this back to the user ,so basi
     email: EmailStr
     age: int
     job_role: str
+    is_admin: bool
+
 
     class Config:
         orm_mode = True     # enables reading data from SQLAlchemy models that is ORM objects
