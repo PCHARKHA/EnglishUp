@@ -535,6 +535,11 @@ footer strong { color:#006666; }
   top: 0;
   z-index: 100;
 }
+.dash-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
 /* Main content wrapper */
 .dash-main {
@@ -691,5 +696,188 @@ footer strong { color:#006666; }
 
   .dash-stats {
     gap: 1.5rem;
+  }
+}
+
+* ══════════════════════════════════════════════════════════════════════════
+   PROFILE SETUP PAGE
+══════════════════════════════════════════════════════════════════════════ */
+
+.profile-page {
+  background: var(--white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-main {
+  flex: 1;
+  padding: 56px 0 80px;
+}
+
+/* Page header above the card */
+.profile-page-header {
+  max-width: 480px;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.profile-page-header h1 {
+  font-size: clamp(1.7rem, 3.5vw, 2.2rem);
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.profile-note {
+  display: inline-block;
+  font-size: 0.82rem;
+  color: var(--teal-dark);
+  background: var(--yellow);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.5rem 0.85rem;
+  text-align: left;
+  margin-top: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Card — mirrors auth-card sizing and feel */
+.profile-card {
+  background: var(--white);
+  border: 3px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.75rem 2.25rem;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(0, 139, 139, 0.08);
+}
+
+/* Form layout */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+/* Radio group container */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* Individual radio option row */
+.radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.radio-option:hover {
+  border-color: var(--teal);
+  background: var(--yellow);
+}
+
+/* Hide the native radio, keep it accessible */
+.radio-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Custom radio indicator */
+.radio-indicator {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--white);
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+
+.radio-indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+  transition: transform 0.18s ease;
+}
+
+/* Checked state via sibling CSS */
+.radio-option input[type="radio"]:checked ~ .radio-indicator {
+  border-color: var(--teal);
+  background: var(--teal-light);
+}
+
+.radio-option input[type="radio"]:checked ~ .radio-indicator::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.radio-option input[type="radio"]:checked ~ .radio-text strong {
+  color: var(--teal-dark);
+}
+
+/* Label for radio group (no input, just block label) */
+.form-label-block {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--dark);
+  letter-spacing: 0.02em;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Text inside each radio option */
+.radio-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radio-text strong {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.9rem;
+  color: var(--dark);
+  font-weight: 700;
+}
+
+.radio-text small {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.78rem;
+  color: var(--mid);
+  line-height: 1.4;
+}
+
+/* Action button row */
+.profile-actions {
+  margin-top: 0.25rem;
+}
+
+.profile-actions .btn {
+  width: 100%;
+  text-align: center;
+  display: block;
+}
+
+@media (max-width: 520px) {
+  .profile-card {
+    padding: 2rem 1.25rem;
   }
 }

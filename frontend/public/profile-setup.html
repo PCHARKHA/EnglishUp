@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Set Up Your Profile — EnglishUp</title>
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head>
+<body class="profile-page">
+
+  <!-- ── Top Bar ────────────────────────────────────────────────────── -->
+  <header class="dash-topbar">
+    <a href="index.html" class="logo">English<span>Up</span></a>
+    <nav class="nav-actions">
+      <a href="index.html" class="btn btn-secondary btn-sm">Logout</a>
+    </nav>
+  </header>
+
+  <!-- ── Page Header ───────────────────────────────────────────────── -->
+  <main class="profile-main">
+    <div class="container">
+
+      <div class="profile-page-header">
+        <p class="col-label">Welcome</p>
+        <h1>Set up your profile</h1>
+        <p class="dash-page-sub">These details help us personalise your English assessments.</p>
+        <p class="profile-note">You can update these details later from your profile settings.</p>
+      </div>
+
+      <!-- ── Profile Card ──────────────────────────────────────────── -->
+      <div class="profile-card">
+
+        <div class="auth-header">
+          <h1>Tell us about yourself</h1>
+          <p class="auth-subtitle">Just a few quick details to get you started on the right path.</p>
+        </div>
+
+        <div class="profile-form">
+
+          <!-- Age Group -->
+          <div class="form-group">
+            <label for="age-group">Age group</label>
+            <select id="age-group" name="age_group">
+              <option value="" disabled selected>Select your age group</option>
+              <option value="under-13">Under 13</option>
+              <option value="13-17">13–17</option>
+              <option value="18-25">18–25</option>
+              <option value="26-40">26–40</option>
+              <option value="40-plus">40+</option>
+            </select>
+          </div>
+
+          <!-- Occupation -->
+          <div class="form-group">
+            <label for="occupation">Occupation / role</label>
+            <select id="occupation" name="occupation">
+              <option value="" disabled selected>Select your occupation</option>
+              <option value="student">Student</option>
+              <option value="working-professional">Working professional</option>
+              <option value="job-seeker">Job seeker</option>
+              <option value="homemaker">Homemaker</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <!-- English Usage Goal -->
+          <div class="form-group">
+            <label for="goal">English usage goal</label>
+            <select id="goal" name="goal">
+              <option value="" disabled selected>Select your primary goal</option>
+              <option value="school-exams">School / exams</option>
+              <option value="job-interviews">Job interviews</option>
+              <option value="workplace-communication">Workplace communication</option>
+              <option value="general-improvement">General improvement</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <!-- Self-assessed Level -->
+          <div class="form-group">
+            <label class="form-label-block">Self-assessed English level</label>
+            <div class="radio-group">
+
+              <label class="radio-option">
+                <input type="radio" name="level" value="beginner" />
+                <span class="radio-indicator"></span>
+                <span class="radio-text">
+                  <strong>Beginner</strong>
+                  <small>I know very basic words and phrases</small>
+                </span>
+              </label>
+
+              <label class="radio-option">
+                <input type="radio" name="level" value="basic" />
+                <span class="radio-indicator"></span>
+                <span class="radio-text">
+                  <strong>Basic</strong>
+                  <small>I can handle simple everyday conversations</small>
+                </span>
+              </label>
+
+              <label class="radio-option">
+                <input type="radio" name="level" value="intermediate" />
+                <span class="radio-indicator"></span>
+                <span class="radio-text">
+                  <strong>Intermediate</strong>
+                  <small>I'm comfortable in most situations</small>
+                </span>
+              </label>
+
+              <label class="radio-option">
+                <input type="radio" name="level" value="advanced" />
+                <span class="radio-indicator"></span>
+                <span class="radio-text">
+                  <strong>Advanced</strong>
+                  <small>I can express complex ideas fluently</small>
+                </span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="profile-actions">
+            <a href="dashboard.html" class="btn btn-primary">Save profile and continue</a>
+          </div>
+
+          <div class="auth-links">
+            <a href="dashboard.html">Skip for now</a>
+          </div>
+
+        </div><!-- /.profile-form -->
+      </div><!-- /.profile-card -->
+
+    </div><!-- /.container -->
+  </main>
+
+</body>
+</html>
