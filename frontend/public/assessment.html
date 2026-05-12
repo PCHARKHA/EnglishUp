@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assessment — EnglishUp</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+</head>
+<body class="dash-body">
+
+  <!-- ── TOP NAV (mirrors dashboard) ──────────────────────────────────── -->
+  <header class="dash-topbar">
+    <a href="index.html" class="logo">English<span>Up</span></a>
+    <nav class="dash-actions">
+      <a href="profile-setup.html" class="btn btn-secondary btn-sm">Profile</a>
+      <a href="dashboard.html"     class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="index.html"         class="btn btn-primary   btn-sm">Logout</a>
+    </nav>
+  </header>
+
+  <!-- ── MAIN CONTENT ─────────────────────────────────────────────────── -->
+  <main class="dash-main container">
+
+    <!-- Page header -->
+    <div class="dash-page-header">
+      <p class="col-label">Assessment</p>
+      <h1>Practice and Evaluate Your English</h1>
+      <p class="dash-page-sub">Choose a skill, complete the prompt, and receive performance scores.</p>
+    </div>
+
+    <!-- ── SKILL SELECTOR ─────────────────────────────────────────────── -->
+    <section class="assess-section" aria-labelledby="skill-heading">
+      <div class="dash-card assess-skill-card">
+        <h2 class="dash-card-title" id="skill-heading">Select a Skill</h2>
+        <p class="dash-card-sub">Pick the area you want to practise today.</p>
+
+        <div class="assess-skill-grid" role="group" aria-label="Skill selection">
+
+          <label class="assess-skill-option">
+            <input type="radio" name="skill" value="speaking" />
+            <span class="assess-skill-indicator" aria-hidden="true"></span>
+            <span class="assess-skill-body">
+              <span class="assess-skill-icon" aria-hidden="true">🎙️</span>
+              <span class="assess-skill-label">Speaking</span>
+              <span class="assess-skill-desc">Record your spoken response to a prompt</span>
+            </span>
+          </label>
+
+          <label class="assess-skill-option">
+            <input type="radio" name="skill" value="writing" checked />
+            <span class="assess-skill-indicator" aria-hidden="true"></span>
+            <span class="assess-skill-body">
+              <span class="assess-skill-icon" aria-hidden="true">✍️</span>
+              <span class="assess-skill-label">Writing</span>
+              <span class="assess-skill-desc">Compose a written response and get scored</span>
+            </span>
+          </label>
+
+          <label class="assess-skill-option">
+            <input type="radio" name="skill" value="grammar" />
+            <span class="assess-skill-indicator" aria-hidden="true"></span>
+            <span class="assess-skill-body">
+              <span class="assess-skill-icon" aria-hidden="true">📝</span>
+              <span class="assess-skill-label">Grammar</span>
+              <span class="assess-skill-desc">Answer targeted grammar questions and exercises</span>
+            </span>
+          </label>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PROMPT ─────────────────────────────────────────────────────── -->
+    <section class="assess-section" aria-labelledby="prompt-heading">
+      <div class="dash-card">
+        <div class="assess-prompt-header">
+          <div>
+            <h2 class="dash-card-title" id="prompt-heading">Your Prompt</h2>
+            <p class="dash-card-sub">Read the prompt carefully before responding.</p>
+          </div>
+          <span class="tag tag-teal">Writing</span>
+        </div>
+
+        <blockquote class="assess-prompt-text">
+          "Describe a challenge you faced and how you solved it."
+        </blockquote>
+
+        <ul class="assess-prompt-hints">
+          <li>Aim for at least <strong>150 words</strong></li>
+          <li>Use clear paragraphs: situation → challenge → solution → result</li>
+          <li>Check spelling and grammar before submitting</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── RESPONSE ───────────────────────────────────────────────────── -->
+    <section class="assess-section" aria-labelledby="response-heading">
+      <div class="dash-card">
+        <h2 class="dash-card-title" id="response-heading">Your Response</h2>
+        <p class="dash-card-sub">Write your answer below. Take your time — quality matters more than speed.</p>
+
+        <div class="form-group">
+          <label for="response-textarea" class="form-label-block">Written Response</label>
+          <textarea
+            id="response-textarea"
+            class="assess-textarea"
+            name="response"
+            rows="10"
+            placeholder="Start writing here… For example: 'One of the biggest challenges I faced was…'"
+            aria-describedby="response-hint"
+          ></textarea>
+          <p id="response-hint" class="assess-textarea-hint">
+            Minimum 150 words recommended for a detailed score breakdown.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SPEAKING PLACEHOLDER ───────────────────────────────────────── -->
+    <section class="assess-section" aria-labelledby="speaking-heading">
+      <div class="dash-card assess-speaking-card">
+        <div class="assess-speaking-inner">
+          <span class="assess-speaking-icon" aria-hidden="true">🎙️</span>
+          <div>
+            <h2 class="dash-card-title" id="speaking-heading">Speaking Response</h2>
+            <p class="dash-card-sub" style="margin-bottom: 0;">
+              Audio recording will be available in a future update. Select <strong>Writing</strong> or
+              <strong>Grammar</strong> above to practise now.
+            </p>
+          </div>
+        </div>
+        <div class="assess-speaking-badge">
+          <span class="tag tag-grey">Coming Soon</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SUBMIT ─────────────────────────────────────────────────────── -->
+    <section class="assess-section assess-submit-row" aria-label="Submit assessment">
+      <div class="assess-submit-group">
+        <button type="button" class="btn btn-primary assess-submit-btn">
+          Submit for Evaluation
+        </button>
+        <p class="assess-submit-note">
+          Scores and feedback are usually ready within a few seconds.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── RESULTS PLACEHOLDER ───────────────────────────────────────── -->
+    <section class="assess-section" aria-labelledby="results-heading">
+      <div class="dash-card assess-results-card">
+        <div class="assess-results-header">
+          <h2 class="dash-card-title" id="results-heading">Your Scores</h2>
+          <span class="tag tag-grey">Awaiting submission</span>
+        </div>
+        <p class="dash-card-sub">Your feedback and scores will appear here after submission.</p>
+
+        <!-- Score skeleton placeholders -->
+        <div class="assess-score-grid" aria-hidden="true">
+          <div class="assess-score-item">
+            <span class="assess-score-label">Vocabulary</span>
+            <div class="assess-score-bar">
+              <div class="assess-score-fill assess-score-empty"></div>
+            </div>
+            <span class="assess-score-value">—</span>
+          </div>
+          <div class="assess-score-item">
+            <span class="assess-score-label">Grammar</span>
+            <div class="assess-score-bar">
+              <div class="assess-score-fill assess-score-empty"></div>
+            </div>
+            <span class="assess-score-value">—</span>
+          </div>
+          <div class="assess-score-item">
+            <span class="assess-score-label">Coherence</span>
+            <div class="assess-score-bar">
+              <div class="assess-score-fill assess-score-empty"></div>
+            </div>
+            <span class="assess-score-value">—</span>
+          </div>
+          <div class="assess-score-item">
+            <span class="assess-score-label">Overall</span>
+            <div class="assess-score-bar">
+              <div class="assess-score-fill assess-score-empty"></div>
+            </div>
+            <span class="assess-score-value">—</span>
+          </div>
+        </div>
+
+        <div class="assess-feedback-placeholder">
+          <p class="assess-feedback-hint">Detailed written feedback will appear here once your response has been evaluated.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER ────────────────────────────────────────────────────────── -->
+  <footer>
+    <strong>EnglishUp</strong> &mdash; &copy; 2025. All rights reserved.
+  </footer>
+
+</body>
+</html>

@@ -881,3 +881,364 @@ footer strong { color:#006666; }
     padding: 2rem 1.25rem;
   }
 }
+/* ══════════════════════════════════════════════════════════════════════════
+   ASSESSMENT PAGE
+   Add this block to the bottom of main.css
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Section spacing ─────────────────────────────────────────────────────── */
+.assess-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Skill selector grid ─────────────────────────────────────────────────── */
+.assess-skill-card {
+  /* extends .dash-card — no extra props needed */
+}
+
+.assess-skill-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 4px;
+}
+
+/* Each skill is a radio-powered card */
+.assess-skill-option {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  background: var(--white);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.assess-skill-option:hover {
+  border-color: var(--teal);
+  background: var(--yellow);
+}
+
+/* Hide native radio */
+.assess-skill-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Custom radio dot (top-right corner) */
+.assess-skill-indicator {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--white);
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.assess-skill-indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  transition: transform 0.18s ease;
+}
+
+/* Checked state */
+.assess-skill-option input[type="radio"]:checked ~ .assess-skill-indicator {
+  border-color: var(--teal);
+  background: var(--teal-light);
+}
+
+.assess-skill-option input[type="radio"]:checked ~ .assess-skill-indicator::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.assess-skill-option input[type="radio"]:checked ~ .assess-skill-body .assess-skill-label {
+  color: var(--teal-dark);
+}
+
+/* Selected card highlight */
+.assess-skill-option:has(input[type="radio"]:checked) {
+  border-color: var(--teal);
+  background: var(--yellow);
+  box-shadow: 0 4px 16px rgba(0, 139, 139, 0.14);
+}
+
+.assess-skill-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 20px; /* avoid overlap with indicator */
+}
+
+.assess-skill-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.assess-skill-label {
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark);
+  transition: color 0.2s;
+}
+
+.assess-skill-desc {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.78rem;
+  color: var(--mid);
+  line-height: 1.45;
+}
+
+/* ── Prompt card ─────────────────────────────────────────────────────────── */
+.assess-prompt-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.assess-prompt-text {
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--dark);
+  border-left: 4px solid var(--teal);
+  background: var(--yellow);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1rem 1.25rem;
+  margin: 0 0 1.25rem;
+  line-height: 1.65;
+}
+
+.assess-prompt-hints {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+}
+
+.assess-prompt-hints li {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.84rem;
+  color: var(--mid);
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.assess-prompt-hints li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--teal);
+  font-size: 0.78rem;
+}
+
+.assess-prompt-hints li strong {
+  color: var(--dark);
+}
+
+/* ── Response textarea ───────────────────────────────────────────────────── */
+.assess-textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.95rem;
+  color: var(--body);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+  resize: vertical;
+  line-height: 1.75;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.assess-textarea::placeholder {
+  color: var(--mid);
+  font-size: 0.88rem;
+}
+
+.assess-textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(0, 139, 139, 0.12);
+}
+
+.assess-textarea-hint {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.78rem;
+  color: var(--mid);
+  margin-top: 6px;
+}
+
+/* ── Speaking placeholder ────────────────────────────────────────────────── */
+.assess-speaking-card {
+  border-style: dashed;
+  background: var(--yellow);
+  position: relative;
+}
+
+.assess-speaking-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.assess-speaking-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.assess-speaking-badge {
+  margin-top: 1rem;
+}
+
+/* ── Submit row ──────────────────────────────────────────────────────────── */
+.assess-submit-row {
+  align-items: flex-start;
+}
+
+.assess-submit-group {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.assess-submit-btn {
+  font-size: 1rem;
+  padding: 14px 36px;
+  white-space: nowrap;
+}
+
+.assess-submit-note {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.82rem;
+  color: var(--mid);
+}
+
+/* ── Results / scores placeholder ───────────────────────────────────────── */
+.assess-results-card {
+  border-color: var(--border);
+}
+
+.assess-results-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.assess-score-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 1.25rem 0 1rem;
+}
+
+.assess-score-item {
+  display: grid;
+  grid-template-columns: 110px 1fr 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.assess-score-label {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--mid);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.assess-score-bar {
+  height: 8px;
+  background: var(--teal-light);
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.assess-score-fill {
+  height: 100%;
+  border-radius: 50px;
+  background: var(--teal);
+  transition: width 0.5s ease;
+}
+
+.assess-score-empty {
+  width: 0%;
+  background: transparent;
+}
+
+.assess-score-value {
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--mid);
+  text-align: right;
+}
+
+.assess-feedback-placeholder {
+  background: var(--yellow);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--border);
+}
+
+.assess-feedback-hint {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.86rem;
+  color: var(--mid);
+  font-style: italic;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .assess-skill-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .assess-prompt-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .assess-score-item {
+    grid-template-columns: 90px 1fr 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .assess-submit-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .assess-submit-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
